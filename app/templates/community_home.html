@@ -1,0 +1,71 @@
+{% extends 'title.html' %}
+{% block content %}
+
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-color: #f8f9fa; /* Light grey background */
+    margin: 0;
+  }
+
+  .container_community {
+    width: 100%;
+    max-width: 400px; /* Slightly reduced width for better focus */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* More prominent shadow for 3D effect */
+    background: #ffffff; /* White background for the form */
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .buttons input,
+  .buttons button {
+    margin-top: 10px;
+  }
+
+  .buttons button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .buttons button:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
+  }
+
+  .alert {
+    margin-top: 20px;
+  }
+</style>
+
+<div class="container_community">
+  <h3 class="text-center">Enter Your Game Room</h3>
+  <form method="post" class="buttons">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name:</label>
+      <input type="text" class="form-control" id="name" placeholder="Your name" name="name" value="{{ name }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="game" class="form-label">Game Room:</label>
+      <input type="text" class="form-control" name="room" value="{{ game.game_name if game else '' }}" readonly>
+    </div>
+    <button type="submit" name="join" class="btn btn-primary">Join Game Room</button>
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}

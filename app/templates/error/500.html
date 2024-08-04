@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Something Went Wrong!</h1>
+        <p>We encountered a problem while trying to fulfill your request. We apologize for the inconvenience.</p>
+        <p>Please try to refresh the page, or come back in a few minutes. We are working to resolve this issue as quickly as possible.</p>
+        <p>You can return to the <a href="{{ url_for('home') }}">homepage</a> or <a href="/contact">contact support</a>.</p>
+        <p>If the problem continues, please don’t hesitate to <a href="/contact">contact us</a>.</p>
+    </div>
+</body>
+</html>

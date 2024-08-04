@@ -1,0 +1,109 @@
+{% extends "title.html" %}
+{% block content %}
+    <div class="content-container container p-5 my-5 shadow">
+        <h3 class="text-center"><strong>Create Your Game</strong></h3>
+     <p class="text-center">Click on the map to select the location for your game. This will set the latitude and longitude automatically.</p>
+        <form method="POST" action="" novalidate class="needs-validation">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group mb-3">
+                {{ form.event_name.label(class='form-label') }}
+                {{ form.event_name(class="form-control") }}
+                {% for error in form.event_name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.date_time.label(class='form-label') }}
+                {{ form.date_time(class="form-control", min=today_date) }}
+                {% for error in form.date_time.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.duration.label(class='form-label') }}
+                {{ form.duration(class="form-control") }}
+                {% for error in form.duration.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.location.label(class='form-label') }}
+                {{ form.location(class="form-control") }}
+                {% for error in form.location.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div id="map" style="height: 400px; width: 100%;"></div> <!-- 地图容器 -->
+
+            <!-- Hidden latitude and longitude inputs -->
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
+            <br>
+            <div class="form-group mb-3">
+                {{ form.description.label(class='form-label') }}
+                {{ form.description(class="form-control") }}
+                {% for error in form.description.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.cost.label(class='form-label') }}
+                {{ form.cost(class="form-control") }}
+                {% for error in form.cost.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.maximum_number_of_players.label(class='form-label') }}
+                {{ form.maximum_number_of_players(class="form-control") }}
+                {% for error in form.maximum_number_of_players.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-grid gap-2">
+                {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+            </div>
+        </form>
+        <br>
+
+
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+        <!-- 地图上选择位置的处理 -->
+        <script>
+            var map = L.map('map').setView([51.505, -0.09], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            var marker;
+
+            map.on('click', function(e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+
+                // 如果已存在标记，则移除
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+
+                // 添加新的标记并更新表单字段
+                marker = L.marker([lat, lng]).addTo(map);
+
+                // 更新表单字段
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+            });
+        </script>
+    </div>
+{% endblock %}

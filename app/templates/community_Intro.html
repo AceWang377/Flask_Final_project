@@ -1,0 +1,60 @@
+{% extends "title.html" %}
+{% block content %}
+{#<!-- section start -->#}
+{#<div style="background-color: #3498db; padding: 20px 0; color: white; display: block; text-align: center;">#}
+{#	<div class="container" style="width: 100%; padding: 0 15px;">#}
+{#		<div class="row" style="margin-right: -15px; margin-left: -15px;">#}
+{#			<div class="col-md-8 col-md-offset-2" style="position: relative; min-height: 1px; padding-right: 15px; padding-left: 15px;">#}
+{#				<h1>Amazing Free Bootstrap Template.</h1>#}
+{#			</div>#}
+{#		</div>#}
+{#	</div>#}
+{#</div>#}
+{#<!-- section end -->#}
+    <style>
+        footer {
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 20px;
+        background-color: #f8f9fa;
+        color: #666;
+    }
+    </style>
+    <br><br><br>
+    <!-- section start -->
+		<section class="section clearfix no-view secPadding" data-animation-effect="fadeIn">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<h1 id="about" class="title text-center">About <span>Community</span></h1>
+						<p class="lead text-center">Here, you can find like-minded people to play basketball with. It is not only a way to find friends who play basketball with you nearby, but also a new way to start a basketball life and make friends in an unfamiliar city.</p>
+						<div class="space"></div>
+						<div class="row">
+							<div class="col-md-6">
+								<img src="{{ url_for("static", filename="data/images/group_pic.jpg") }}" alt="">
+								<div class="space"></div>
+							</div>
+							<div class="col-md-6">
+								<p>We are dedicated to helping people who want to play basketball and want to find someone to play basketball with.</p>
+								<ul class="list-unstyled">
+									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> Our focus is to make it easier for you to enter the basketball community</li>
+									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> We are not just a basketball community platform, we hope that you can find your good friends through basketball</li>
+									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> I hope you can explore more than just basketball stories here.</li>
+									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> We care more about your mental health in this community than your basketball skills.</li>
+									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> We hope that people from all walks of life can come together and share their stories with basketball here.</li>
+								</ul>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+		</section>
+		<!-- section end -->
+
+
+<footer>
+    <p>Copyright © 2024 Ace.</p>
+</footer>
+
+
+{% endblock %}

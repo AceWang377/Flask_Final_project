@@ -1,0 +1,114 @@
+{% extends "title.html" %}
+{% block content %}
+<style>
+    #profileContainer {
+        max-width: 800px;
+        margin: 2rem auto;
+        font-family: 'Arial', sans-serif;
+        color: #333;
+    }
+    .profile-section {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .profile-section h2 {
+        border-bottom: 2px solid #007bff;
+        color: #007bff;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .profile-section ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .profile-section li {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .profile-section li:last-child {
+        border-bottom: none;
+    }
+    .chatroom-link:hover {
+        background-color: #e9ecef;
+        text-decoration: none;
+    }
+    footer {
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 20px;
+        background-color: #f8f9fa;
+        color: #666;
+    }
+
+    .profile-pic {
+        width: 125px;  /* Match the width of the resized images */
+        height: 125px; /* Match the height of the resized images */
+        object-fit: cover; /* Ensure the image covers the area without distorting aspect ratio */
+        border-radius: 50%; /* Optional: makes the image round */
+    }
+
+</style>
+    <br><br><br><br><br>
+<div id="profileContainer">
+
+
+
+    <div class="profile-section">
+        <h1>Welcome, {{ user.username }}</h1>
+        <h2>Your Personal Information</h2>
+        <img src="{{ image_file }}" alt="Profile Image" class="profile-pic">
+        <form action="" method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.picture.label }}
+                {{ form.picture }}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+        <!-- 其他个人信息 -->
+        <p>Email: {{ user.email }}</p>
+        <p>Date of Birth: {{ user.date_of_birth.strftime('%Y-%m-%d') }}</p>
+        <p>Telephone: {{ user.telephone }}</p>
+        <p>Location: {{ user.location }}</p>
+        <p>Height: {{ user.height }} cm</p>
+        <p>Weight: {{ user.weight }} kg</p>
+    </div>
+
+    <div class="profile-section">
+        <h2>Your Games</h2>
+        <ul>
+            {% for game in current_user.games %}
+                <li><a href="{{ url_for('game_details', game_id=game.game_id) }}">{{ game.game_name }}</a> - {{ game.game_date.strftime('%Y-%m-%d') }}</li>
+            {% else %}
+                <li>You have not joined any games.</li>
+            {% endfor %}
+        </ul>
+
+
+    </div>
+
+    <div class="profile-section">
+        <h2>Your Messages in Chatrooms</h2>
+        <ul>
+            {% for chatroom in chat_rooms %}
+                <!-- 使用 Flask url_for 构建动态链接到聊天室 -->
+                <li>
+                    <a href="{{ url_for('room', game_id=chatroom.game_id) }}" class="chatroom-link">
+                        Join {{ chatroom.chat_room_name }}
+                    </a>
+                </li>
+            {% else %}
+                <li>No chat rooms available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<footer>
+    <p>Copyright © 2024 Ace.</p>
+</footer>
+{% endblock %}

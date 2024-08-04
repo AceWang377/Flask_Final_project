@@ -1,0 +1,93 @@
+{% extends "title.html" %}
+{% block content %}
+<style>
+
+/* Base styles for game details page */
+.game-details-container {
+    font-family: 'Open Sans', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 150px;
+    background-color: #ffffff;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.game-details-container h1, .game-details-container h2 {
+    font-family: 'Raleway', sans-serif;
+    color: #333;
+}
+
+.game-details-container h1 {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.game-details-container h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.game-details-container a {
+    color: #55acee;
+    text-decoration: none; /* Removes underline */
+}
+
+.game-details-container a:hover {
+    color: #339BEB;
+}
+
+.game-details-container .card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+/* Additional styles */
+.game-details-container .large {
+    font-size: 18px;
+}
+
+.game-details-container .colored {
+    color: #0A94DB;
+}
+
+/* Button styles */
+.game-details-container .btn-primary {
+    background-color: #0A94DB;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    display: inline-block;
+}
+
+.game-details-container .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+</style>
+
+<div class="game-details-container">
+    <h1>Game Details</h1>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ game.game_name }}</h2>
+            <p class="card-text"><strong>Date and Time:</strong> {{ game.game_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p class="card-text"><strong>Duration:</strong> {{ game.game_duration }} Hour(s)</p>
+            <p class="card-text"><strong>Location:</strong> {{ game.location.address_name }}</p>
+            <p class="card-text"><strong>Description:</strong> {{ game.game_description }}</p>
+            <p class="card-text"><strong>Cost:</strong> £{{ '%.2f' | format(game.game_cost) }}/p</p>
+            <p class="card-text"><strong>Maximum players:</strong> {{ game.game_players_number }}</p>
+
+        </div>
+    </div>
+    <br>
+    <a href="{{ url_for('search_games') }}" class="btn btn-primary">Back to Games</a>
+    <a href="{{ url_for('community_page', game_id=game.game_id) }}" class="btn btn-primary">Join Community</a>
+</div>
+{% endblock %}
+

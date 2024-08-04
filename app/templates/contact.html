@@ -1,0 +1,82 @@
+{% extends 'title.html' %}
+{% block content %}
+    <br><br><br><br><br>
+	<!-- .footer start -->
+
+			<div class="footer section">
+				<div class="container">
+					<h1 class="title text-center" id="contact">Contact Us</h1>
+					<div class="space"></div>
+					<div class="row">
+
+
+						<div class="col-sm-6">
+							<div class="footer-content">
+								<form role="form" id="footer-form" method="POST" action="{{ url_for('contact') }}" novalidate class="needs-validation">
+                                    {{ form.hidden_tag() }}
+                                    <div c lass="form-group has-feedback">
+                                        {{ form.name.label(class='sr-only', for='name') }}
+                                        {{ form.name(class="form-control", id="name", placeholder="Name", required=True) }}
+                                        {% for error in form.name.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                        <i class="fa fa-user form-control-feedback"></i>
+                                    </div>
+
+                                    <div class="form-group has-feedback">
+                                        {{ form.email.label(class='sr-only', for='email') }}
+                                        {{ form.email(class="form-control", id="email", placeholder="Enter email", required=True) }}
+                                        {% for error in form.email.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                        <i class="fa fa-envelope form-control-feedback"></i>
+                                    </div>
+
+                                    <div class="form-group has-feedback">
+                                        {{ form.message.label(class='sr-only', for='message') }}
+                                        {{ form.message(class="form-control", id="message", placeholder="Message", required=True, rows=6) }}
+                                        {% for error in form.message.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                        <i class="fa fa-pencil form-control-feedback"></i>
+                                    </div>
+
+                                    <input type="submit" value="Send" class="btn btn-default">
+                                </form>
+
+							</div>
+						</div>
+
+						<div class="col-sm-6">
+							<div class="footer-content">
+
+
+							<div class="widget-content">
+
+								<p>If you have any enquiry, please do not hesitate to contact us.
+Leave us a message and we will get back to you shortly.</p><br/>
+
+								<p class="contacts"><i class="fa fa-map-marker"></i> University of Birmingham </p>
+
+								<p class="contacts"><i class="fa fa-phone"></i> Not available</p>
+
+								<p class="contacts"><i class="fa fa-envelope"></i> hooplife377@fastmail.com</p>
+
+
+							</div>
+
+								<ul class="social-links">
+									<li class="facebook"><a target="_blank" href="#"><i class="fa fa-facebook"></i></a></li>
+									<li class="twitter"><a target="_blank" href="#"><i class="fa fa-twitter"></i></a></li>
+									<li class="googleplus"><a target="_blank" href="#"><i class="fa fa-google-plus"></i></a></li>
+									<li class="skype"><a target="_blank" href="#"><i class="fa fa-skype"></i></a></li>
+									<li class="linkedin"><a target="_blank" href="#"><i class="fa fa-linkedin"></i></a></li>
+									<li class="youtube"><a target="_blank" href="#"><i class="fa fa-youtube"></i></a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- .footer end -->
+{% endblock %}

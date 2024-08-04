@@ -1,0 +1,90 @@
+{% extends "title.html" %}
+{% block content %}
+
+    <div class="content-container container p-5 my-5 shadow">
+        <h3 class="text-center"><strong>Create Your Account</strong></h3>
+     <p class="text-center">Join the game with your own username.</p>
+
+    <form method="POST" action="" novalidate class="needs-validation">
+        {{ signupform.hidden_tag() }}
+
+        <div class="form-group mb-3">
+            {{ signupform.username.label(class='form-label') }}
+            {{ signupform.username(class="form-control") }}
+            {% for error in signupform.username.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.password.label(class='form-label') }}
+            {{ signupform.password(class="form-control") }}
+            {% for error in signupform.password.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.confirm_password.label(class='form-label') }}
+            {{ signupform.confirm_password(class="form-control") }}
+            {% for error in signupform.confirm_password.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.email_address.label(class='form-label') }}
+            {{ signupform.email_address(class="form-control") }}
+            {% for error in signupform.email_address.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.date_of_birthday.label(class='form-label') }}
+            {{ signupform.date_of_birthday(class="form-control") }}
+            {% for error in signupform.date_of_birthday.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.tel_phone.label(class='form-label') }}
+            {{ signupform.tel_phone(class="form-control") }}
+            {% for error in signupform.tel_phone.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.location_address.label(class='form-label') }}
+            {{ signupform.location_address(class="form-control") }}
+            {% for error in signupform.location_address.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.height.label(class='form-label') }}
+            {{ signupform.height(class="form-control") }}
+            {% for error in signupform.height.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mb-3">
+            {{ signupform.weight.label(class='form-label') }}
+            {{ signupform.weight(class="form-control") }}
+            {% for error in signupform.weight.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="d-grid gap-2">
+            {{ signupform.submit(class="btn btn-primary btn-lg btn-block") }}
+            <a class="btn btn-outline-info" href="{{ url_for('login_page') }}">Already have an account? Log In</a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
