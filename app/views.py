@@ -477,7 +477,6 @@ def save_picture(form_picture):
     return picture_fn
 
 
-
 @app.route('/attend-game/<int:game_id>', methods=['POST'])
 @login_required
 def attend_game(game_id):
