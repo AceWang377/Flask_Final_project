@@ -14,7 +14,7 @@
 							<div class="footer-content">
 								<form role="form" id="footer-form" method="POST" action="{{ url_for('contact') }}" novalidate class="needs-validation">
                                     {{ form.hidden_tag() }}
-                                    <div c lass="form-group has-feedback">
+                                    <div class="form-group has-feedback">
                                         {{ form.name.label(class='sr-only', for='name') }}
                                         {{ form.name(class="form-control", id="name", placeholder="Name", required=True) }}
                                         {% for error in form.name.errors %}
