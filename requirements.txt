@@ -135,7 +135,7 @@ networkx==2.6.3
 notebook==6.4.6
 notebook_shim==0.1.0
 numexpr==2.7.3
-numpy==1.21.4
+numpy==2.0.1
 oauthlib==3.1.1
 openai==0.10.2
 overrides==6.1.0
