@@ -7,7 +7,6 @@ from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import BooleanField
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo, NumberRange, ValidationError, Email
 from datetime import date
-from app.model import User
 from flask_wtf.file import FileField, FileAllowed
 
 class SignUpForm(FlaskForm):
