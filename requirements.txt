@@ -27,7 +27,7 @@ certifi==2021.10.8
 cffi==1.15.0
 chardet==5.0.0
 charset-normalizer==2.0.7
-click==8.0.3
+click==8.1.7
 constantly==15.1.0
 contourpy==1.0.1
 cryptography==36.0.0
