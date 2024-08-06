@@ -142,23 +142,34 @@
         messageQueue = [];
     }
 
-    function sendMessage() {
-        var currentTime = Date.now();
-        if (currentTime - lastEmitTime < emitInterval) {
-            console.log('Please wait before sending another message.');
-            return; // Throttle messages
-        }
-        var messageInput = document.getElementById("message");
-        var message = messageInput.value.trim();
-        if (message === "") {
-            console.log('Cannot send an empty message.');
-            return;
-        }
-        socket.emit('message', { name: userName, message: message, room: gameName });
-        messageInput.value = '';
-        lastEmitTime = currentTime;
-        console.log('Sent message:', message);
-    }
+    {#function sendMessage() {#}
+    {#    var currentTime = Date.now();#}
+    {#    if (currentTime - lastEmitTime < emitInterval) {#}
+    {#        console.log('Please wait before sending another message.');#}
+    {#        return; // Throttle messages#}
+    {#    }#}
+    {#    var messageInput = document.getElementById("message");#}
+    {#    var message = messageInput.value.trim();#}
+    {#    if (message === "") {#}
+    {#        console.log('Cannot send an empty message.');#}
+    {#        return;#}
+    {#    }#}
+    {#    socket.emit('message', { name: userName, message: message, room: gameName });#}
+    {#    messageInput.value = '';#}
+    {#    lastEmitTime = currentTime;#}
+    {#    console.log('Sent message:', message);#}
+
+        socket.on('message', function(data) {
+        setTimeout(function() {
+            // Emit the message after a delay of 5000 milliseconds (5 seconds)
+            socket.broadcast.to(data.room).emit('message', {
+                username: data.name,
+                message: data.message
+            });
+            console.log('Delayed message sent:', data);
+        }, 5000);
+    });
+
 
     function attendGame(gameId) {
         fetch(`/attend-game/${gameId}`, { method: 'POST' })
