@@ -94,6 +94,7 @@
       integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
       crossorigin="anonymous"
     ></script>
+
 <script type="text/javascript">
     var socket = io();
     var gameName = "{{ game.game_name }}";
@@ -101,7 +102,7 @@
 
     var messageQueue = [];
     var lastEmitTime = Date.now();
-    var emitInterval = 1000; // Time in ms to wait before sending another message
+    var emitInterval = 5000; // Set the interval to 5000ms or 5 seconds
 
     socket.on('connect', function() {
         console.log('Connected to server.');
@@ -144,7 +145,7 @@
     function sendMessage() {
         var currentTime = Date.now();
         if (currentTime - lastEmitTime < emitInterval) {
-            console.log('Wait before sending another message.');
+            console.log('Please wait before sending another message.');
             return; // Throttle messages
         }
         var messageInput = document.getElementById("message");
@@ -174,5 +175,6 @@
         .catch(error => console.error('Error:', error));
     }
 </script>
+
 
 {% endblock %}
