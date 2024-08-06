@@ -58,7 +58,12 @@ login_manager.login_view = 'login_page'
 
 basedir = os.path.abspath(os.path.dirname(__file__)) # get the path of current file
 # 设置 SQL 数据库的 URI，数据库文件位于项目目录下的 data 文件夹中，文件名为 hooplife
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:aqj710310@localhost/hooplife'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:aqj710310@localhost/hooplife'
+
+from sqlalchemy.dialects.postgresql.base import PGDialect
+PGDialect._get_server_version_info = lambda *args: (9, 2)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zixuan:uXwqAMRtJkmngBVlxFvKmA@hooplife-15923.8nj.gcp-europe-west1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full'
+# export DATABASE_URL=""
 # 禁用 SQLAlchemy 的修改追踪，以减少额外的内存开销。
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # initialize sql in flask
