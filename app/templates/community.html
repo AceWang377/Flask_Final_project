@@ -96,9 +96,12 @@
     ></script>
 <script type="text/javascript">
     var socket = io();
+    var gameName = "{{ game.game_name }}";
+    var userName = "{{ session['name'] }}";
 
-    var gameName = "{{ game.game_name }}"; // 确保这是从服务器端正确传入的游戏名称
-    var userName = "{{ session['name'] }}"; // 同样确保这是正确的用户名
+    var messageQueue = [];
+    var lastEmitTime = Date.now();
+    var emitInterval = 1000; // Time in ms to wait before sending another message
 
     socket.on('connect', function() {
         console.log('Connected to server.');
@@ -110,27 +113,40 @@
         }
     });
 
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         var messageInput = document.getElementById("message");
-
         messageInput.addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
-                event.preventDefault();  // 阻止回车默认的换行功能
-                sendMessage();  // 调用发送消息的函数
+                event.preventDefault();
+                sendMessage();
             }
         });
     });
 
     socket.on('message', function(data) {
-        console.log('Received message:', data);
-        var chatMessages = document.getElementById("chat-messages");
-        var msgElement = document.createElement("div");
-        msgElement.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
-        chatMessages.appendChild(msgElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // 自动滚动到最新消息
+        messageQueue.push(data);
+        if (messageQueue.length === 1) {
+            setTimeout(processMessageQueue, 100); // Process messages every 100ms
+        }
     });
 
+    function processMessageQueue() {
+        var chatMessages = document.getElementById("chat-messages");
+        messageQueue.forEach(function(data) {
+            var msgElement = document.createElement("div");
+            msgElement.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
+            chatMessages.appendChild(msgElement);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        messageQueue = [];
+    }
+
     function sendMessage() {
+        var currentTime = Date.now();
+        if (currentTime - lastEmitTime < emitInterval) {
+            console.log('Wait before sending another message.');
+            return; // Throttle messages
+        }
         var messageInput = document.getElementById("message");
         var message = messageInput.value.trim();
         if (message === "") {
@@ -138,36 +154,25 @@
             return;
         }
         socket.emit('message', { name: userName, message: message, room: gameName });
-        messageInput.value = ''; // 清空输入框
+        messageInput.value = '';
+        lastEmitTime = currentTime;
         console.log('Sent message:', message);
     }
 
-
-    {#attend game button#}
     function attendGame(gameId) {
-        // 确保使用正确的路径和配置fetch API
         fetch(`/attend-game/${gameId}`, { method: 'POST' })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
         })
         .then(data => {
-            // 检查返回的数据中是否包含状态，根据状态更新按钮文字
             if (data.status === 'success') {
-                document.getElementById('attend-button').innerText = 'Game Attended';
+                document.getElementById('attend-game-btn').innerText = 'Game Attended';
             }
-            // 显示后端传回的消息
             alert(data.message);
         })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        .catch(error => console.error('Error:', error));
     }
-
-
-
-
 </script>
+
 {% endblock %}
