@@ -69,9 +69,6 @@
     <div class="chat-box">
     <button id="attend-game-btn" class="btn btn-success" onclick="attendGame({{ game.game_id }})">Attend the Game</button>
     <h2 align="center">Game Chatting Room: {{game.game_name}}</h2>
-{#        <div class="user-count">#}
-{#            Users in room: <span id="user-count">0</span>#}
-{#        </div>#}
 
         <div class="chat-messages" id="chat-messages">
             {% for msg in messages %}
@@ -89,20 +86,13 @@
     </div>
 </div>
 
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
       integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
-      crossorigin="anonymous"
-    ></script>
-
+      crossorigin="anonymous"></script>
 <script type="text/javascript">
     var socket = io();
     var gameName = "{{ game.game_name }}";
     var userName = "{{ session['name'] }}";
-
-    var messageQueue = [];
-    var lastEmitTime = Date.now();
-    var emitInterval = 5000; // Set the interval to 5000ms or 5 seconds
 
     socket.on('connect', function() {
         console.log('Connected to server.');
@@ -116,65 +106,42 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         var messageInput = document.getElementById("message");
+
         messageInput.addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
-                event.preventDefault();
-                sendMessage();
+                event.preventDefault(); // Prevent default line break
+                sendMessage(); // Call the sendMessage function
             }
         });
     });
 
     socket.on('message', function(data) {
-        messageQueue.push(data);
-        if (messageQueue.length === 1) {
-            setTimeout(processMessageQueue, 100); // Process messages every 100ms
-        }
-    });
-
-    function processMessageQueue() {
+        console.log('Received message:', data);
         var chatMessages = document.getElementById("chat-messages");
-        messageQueue.forEach(function(data) {
-            var msgElement = document.createElement("div");
-            msgElement.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
-            chatMessages.appendChild(msgElement);
-        });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        messageQueue = [];
-    }
-
-    {#function sendMessage() {#}
-    {#    var currentTime = Date.now();#}
-    {#    if (currentTime - lastEmitTime < emitInterval) {#}
-    {#        console.log('Please wait before sending another message.');#}
-    {#        return; // Throttle messages#}
-    {#    }#}
-    {#    var messageInput = document.getElementById("message");#}
-    {#    var message = messageInput.value.trim();#}
-    {#    if (message === "") {#}
-    {#        console.log('Cannot send an empty message.');#}
-    {#        return;#}
-    {#    }#}
-    {#    socket.emit('message', { name: userName, message: message, room: gameName });#}
-    {#    messageInput.value = '';#}
-    {#    lastEmitTime = currentTime;#}
-    {#    console.log('Sent message:', message);#}
-
-        socket.on('message', function(data) {
-        setTimeout(function() {
-            // Emit the message after a delay of 5000 milliseconds (5 seconds)
-            socket.broadcast.to(data.room).emit('message', {
-                username: data.name,
-                message: data.message
-            });
-            console.log('Delayed message sent:', data);
-        }, 5000);
+        var msgElement = document.createElement("div");
+        msgElement.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
+        chatMessages.appendChild(msgElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to new message
     });
 
+    function sendMessage() {
+        var messageInput = document.getElementById("message");
+        var message = messageInput.value.trim();
+        if (message === "") {
+            console.log('Cannot send an empty message.');
+            return;
+        }
+        socket.emit('message', { name: userName, message: message, room: gameName });
+        messageInput.value = ''; // Clear the input box
+        console.log('Sent message:', message);
+    }
 
     function attendGame(gameId) {
         fetch(`/attend-game/${gameId}`, { method: 'POST' })
         .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             return response.json();
         })
         .then(data => {
@@ -183,9 +150,10 @@
             }
             alert(data.message);
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 </script>
-
 
 {% endblock %}
