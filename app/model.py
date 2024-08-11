@@ -59,12 +59,6 @@ class User(db.Model, UserMixin):
 
 
 
-class VideosModel(db.Model):
-    __tablename__ = 'videos'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(30), nullable=False, unique=True, index=True)
-    path = db.Column(db.String(200), nullable=False)
-
 
 class LocationModel(db.Model):
     __tablename__ = 'locations'
