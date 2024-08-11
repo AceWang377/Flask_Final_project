@@ -14,7 +14,7 @@ from PIL import Image
 
 from app.form import SignUpForm, LoginForm, ResetPasswordForm, RequiredResetForm, CreateGameForm, UpdateProfileForm, LeaveMessageForm
 from app import app, db, bcrypt, login_manager, socketio
-from app.model import User, VideosModel, LocationModel, HoopgameModel, MessageModel, ChatRoomModel, CommentModel
+from app.model import User, LocationModel, HoopgameModel, MessageModel, ChatRoomModel, CommentModel
 from datetime import datetime, date
 import random
 import os
