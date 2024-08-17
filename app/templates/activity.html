@@ -79,7 +79,7 @@
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-        <!-- 地图上选择位置的处理 -->
+        <!-- Processing of selected locations on the map -->
         <script>
             var map = L.map('map').setView([51.505, -0.09], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -92,15 +92,15 @@
                 var lat = e.latlng.lat;
                 var lng = e.latlng.lng;
 
-                // 如果已存在标记，则移除
+                // If the tag already exists, remove it
                 if (marker) {
                     map.removeLayer(marker);
                 }
 
-                // 添加新的标记并更新表单字段
+                // Add new tags and update form fields
                 marker = L.marker([lat, lng]).addTo(map);
 
-                // 更新表单字段
+                // Update form fields
                 document.getElementById('latitude').value = lat;
                 document.getElementById('longitude').value = lng;
             });

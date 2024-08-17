@@ -34,22 +34,24 @@
     </style>
     <div id="mapContainer">
         <div id="map"></div>
-        <button id="findLocationBtn" onclick="locateUser()">Find My Location</button> <!-- 修改后的定位按钮 -->
+        <button id="findLocationBtn" onclick="locateUser()">Find My Location</button>
     </div>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script src="https://unpkg.com/leaflet-search"></script>
 
 <script>
-    var map = L.map('map').setView([51.505, -0.09], 13); // 设置默认位置和缩放级别
+    var map = L.map('map').setView([51.505, -0.09], 13); // Setting the default position and zoom level
 
     // Tile layer: OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // 添加搜索控制器
+    // Add Search Controller
+
     var searchControl = new L.Control.Search({
         url: 'https://nominatim.openstreetmap.org/search?format=json&q={s}',
         jsonpParam: 'json_callback',
@@ -60,6 +62,7 @@
         autoType: false,
         minLength: 2
     });
+
 
     searchControl.on('results', function(data) {
         var firstResult = data.results[0];
@@ -72,9 +75,9 @@
 
     map.addControl(searchControl);
 
-    // 定义位置找到时的处理函数
+    // Define the processing function when the position is found
     function onLocationFound(e) {
-        var radius = e.accuracy / 2; // 精度圈半径
+        var radius = e.accuracy / 2; // radius
 
         L.marker(e.latlng).addTo(map)
             .bindPopup("You are within " + radius + " meters from this point").openPopup();
@@ -82,23 +85,23 @@
         L.circle(e.latlng, radius).addTo(map);
     }
 
-    // 定义位置错误时的处理函数
+    // Define the processing function when the position error occurs
     function onLocationError(e) {
         alert(e.message);
     }
 
-    // 用户手动触发定位
+    // User manually triggers positioning
     function locateUser() {
         map.locate({setView: true, maxZoom: 16});
     }
 
-    // 新增 fetch 从后端获取地点数据并在地图上显示
+    // Added fetch to get location data from the backend and display it on the map
     function fetchGamesAndMarkOnMap() {
         fetch('/get-locations')
         .then(response => response.json())
         .then(locations => {
             locations.forEach(loc => {
-                var popupContent = `<a href="/game_details/${loc.game_id}" target="_blank">${loc.game_name}</a> - ${loc.address}`;
+                var popupContent = `<a href="/game_details/${loc.game_id}" target="_blank">${loc.game_name}</a>- ${loc.address}`;
 
                 var marker = L.marker([loc.lat, loc.lon]).addTo(map);
                 marker.bindPopup(popupContent);
@@ -107,7 +110,7 @@
         .catch(error => console.error('Error fetching locations:', error));
     }
 
-    // 调用函数，以确保加载地点
+    // Call function to ensure loading location
     fetchGamesAndMarkOnMap();
 
     map.on('locationfound', onLocationFound);

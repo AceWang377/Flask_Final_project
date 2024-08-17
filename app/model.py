@@ -31,21 +31,12 @@ class User(db.Model, UserMixin):
         return f"User '{self.username}', '{self.user_id}'"
 
     def get_id(self):
-        return str(self.user_id)  # Flask-Login 要求返回字符串类型的 ID
+        return str(self.user_id)  # Flask-Login requires a string ID to be returned
 
     def get_token(self, expires_sec=300):
         serializer = Serializer(current_app.config['SECRET_KEY'])
         return serializer.dumps({'user_id': self.user_id}, salt='token-generator')
 
-
-    @staticmethod
-    def verify_token(token):
-        serializer = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            user_id = serializer.loads(token, salt='token-generator', max_age=300)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
 
     @staticmethod
     def verify_reset_token(token):
