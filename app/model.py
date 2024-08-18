@@ -6,7 +6,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 from app import db, login_manager, app
 from datetime import datetime
 
-# Association table for game members 使用前定义user and hoopgame的关系
+# Association table for game members. Define the relationship between user and hoopgame before use
 game_members = db.Table('game_members',
     db.Column('user_id', db.Integer, db.ForeignKey('user.user_id'), primary_key=True),
     db.Column('game_id', db.Integer, db.ForeignKey('hoops.game_id'), primary_key=True)
@@ -48,9 +48,6 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
 
 
-
-
-
 class LocationModel(db.Model):
     __tablename__ = 'locations'
     locals_id = db.Column(db.Integer, primary_key=True)
@@ -81,7 +78,7 @@ class HoopgameModel(db.Model):
 class ChatRoomModel(db.Model):
     __tablename__ = 'chatrooms'
     id = db.Column(db.Integer, primary_key=True)
-    chat_room_name = db.Column(db.String(255), nullable=False, unique=True)  # 添加聊天室名称字段
+    chat_room_name = db.Column(db.String(255), nullable=False, unique=True)
     game_id = db.Column(db.Integer, db.ForeignKey('hoops.game_id'), nullable=False)
     game = db.relationship('HoopgameModel', back_populates='chat_room')
     messages = db.relationship('MessageModel', back_populates='chat_room', lazy='dynamic')
@@ -95,7 +92,7 @@ class MessageModel(db.Model):
     chat_room_id = db.Column(db.Integer, db.ForeignKey('chatrooms.id'), nullable=False)
     chat_room = db.relationship('ChatRoomModel', back_populates='messages')
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
-    user = db.relationship('User', backref='messages')  # 添加这行来引用 User 模型
+    user = db.relationship('User', backref='messages')
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 

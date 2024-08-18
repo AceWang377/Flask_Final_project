@@ -119,7 +119,10 @@ def send_mail(user):
 
             print('Email sent successfully!')
         except Exception as e:
+            current_app.logger.error(f'Something went wrong {e}')
             print('Something went wrong:', e)
+            return False
+        return True
 
 
 
@@ -130,17 +133,25 @@ def forget_password():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_mail(user)
-            flash('Request has been reset. Please check your email.','success')
+            if send_mail(user):
+                flash('A reset link has been sent to your email. Please check your email.', 'success')
+            else:
+                flash('Failed to send email, please try again later.', 'danger')
             return redirect(url_for('login_page'))
+        else:
+            flash('No account found with that email.', 'danger')
     return render_template('forget_password.html',form=form)
 
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     user = User.verify_reset_token(token)
-    if user is None:
-        flash('Invalid email, please try again.','warning')
+    if 'reset_successful' in session:
+        flash('Your password has been updated successfully.', 'success')
+        return redirect(url_for('login_page'))
+
+    if user is None and request.method == 'GET':
+        flash('Invalid or expired token, please try again.','warning')
         return redirect(url_for('forget_password'))
 
     form = ResetPasswordForm()
@@ -148,11 +159,10 @@ def reset_password(token):
         hashed_password = bcrypt.generate_password_hash(form.current_password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        flash('Your password has been updated successfully.','success')
-        return redirect('login_page')
+        session['reset_successful'] = True
+        return redirect(url_for('reset_password', token=token))
 
-
-    return render_template('reset_password.html',form=form)
+    return render_template('reset_password.html',form=form, token=token)
 
 
 
@@ -180,7 +190,7 @@ def activity_page():
         event_name = form.event_name.data
         date_time = form.date_time.data
         duration = form.duration.data
-        location_name = form.location.data  # 假设这是地址名称
+        location_name = form.location.data
         longitude = form.longitude.data
         latitude = form.latitude.data
         description = form.description.data
@@ -192,24 +202,24 @@ def activity_page():
             return redirect(url_for('activity_page'))
 
 
-        # 查找或创建位置
+        # Find or create a location
         location = LocationModel.query.filter_by(latitude=latitude, longitude=longitude).first()
         if not location:
             new_location = LocationModel(latitude=latitude, longitude=longitude, address_name=location_name)
             db.session.add(new_location)
-            db.session.flush()  # 需要立即生成 ID
+            db.session.flush()  # Need to generate ID immediately
         else:
             flash('There is a game with that location', 'danger')
             return redirect(url_for('activity_page'))
 
-        # 创建新游戏
+        # Create new game
         new_game = HoopgameModel(game_name=event_name, game_date=date_time, game_duration=duration,
                                  game_description=description,
                                  game_location_id=new_location.locals_id, game_cost=cost,
                                  game_players_number=players_num)
         db.session.add(new_game)
 
-        # 尝试同时创建聊天室
+        # Try to create chat rooms simultaneously
         new_chat_room = ChatRoomModel(chat_room_name=event_name, game=new_game)
         db.session.add(new_chat_room)
 
@@ -223,25 +233,25 @@ def activity_page():
 
     return render_template('activity.html', form=form, today_date=today_date)
 
-
-# 使用 Nominatim API 将地址转换为经纬度
+'''
+# Use the Nominatim API to convert addresses to latitude and longitude
 def geocode_address(address):
     try:
-        # 发送请求到 Nominatim API
+        # Sending a request to the Nominatim API
         response = requests.get(f"https://nominatim.openstreetmap.org/search?format=json&limit=1&q={address}")
 
-        # 检查 HTTP 状态码
+        # Check HTTP status code
         if response.status_code != 200:
             print(f"Failed to get data: HTTP status code {response.status_code}")
             return None, None
 
-        # 检查返回的内容是否为 JSON 格式
+        # Check if the returned content is in JSON format
         if 'application/json' in response.headers.get('Content-Type', ''):
-            data = response.json()  # 尝试解析 JSON
+            data = response.json()  # Try to parse JSON
             if data and isinstance(data, list) and len(data) > 0 and 'lat' in data[0] and 'lon' in data[0]:
                 lat = data[0]['lat']
                 lon = data[0]['lon']
-                print(f"Geocoded {address} to {lat}, {lon}")  # 打印或记录经纬度
+                print(f"Geocoded {address} to {lat}, {lon}")  # Print or record longitude and latitude
                 return lat, lon
             else:
                 print("No valid location data found.")
@@ -253,13 +263,13 @@ def geocode_address(address):
         print(f"Error decoding JSON: {e}")
 
     return None, None
-
+'''
 
 # get-locations
 @app.route('/get-locations')
 def get_locations():
     current_time = datetime.utcnow()
-    # LocationModel 关联到 HoopgameModel，且有外键关系
+    # LocationModel is associated with HoopgameModel and has a foreign key relationship
     locations = db.session.query(LocationModel, HoopgameModel).join(
         HoopgameModel, LocationModel.hoopgames).filter(HoopgameModel.game_date>current_time).all()
     locations_data = [
@@ -267,8 +277,8 @@ def get_locations():
             'lat': loc.LocationModel.latitude,
             'lon': loc.LocationModel.longitude,
             'address': loc.LocationModel.address_name,
-            'game_id': loc.HoopgameModel.game_id,  # 获取游戏ID
-            'game_name': loc.HoopgameModel.game_name  # 获取游戏名称
+            'game_id': loc.HoopgameModel.game_id,
+            'game_name': loc.HoopgameModel.game_name
         }
         for loc in locations
     ]
@@ -278,7 +288,7 @@ def get_locations():
 @login_required
 @app.route('/game_details/<int:game_id>')
 def game_details(game_id):
-    game = HoopgameModel.query.get_or_404(game_id)  # 获取游戏或返回404错误
+    game = HoopgameModel.query.get_or_404(game_id)  # Get the game or return 404 error
     return render_template('game_details.html', game=game)
 
 
@@ -289,153 +299,134 @@ def community():
 
 
 # chatrooms
-rooms = {}  # 存储房间信息和消息
+rooms = {}  # Store room information and messages
 
 # community
 @app.route('/community',defaults={'game_id': None})
 @app.route('/community/<int:game_id>', methods=['GET', 'POST'])
 @login_required
 def community_page(game_id):
-    game = HoopgameModel.query.get_or_404(game_id)  # 获取游戏详情
-    room = game.game_name  # 设置房间名为游戏名称
-
-
+    game = HoopgameModel.query.get_or_404(game_id)  # Get game details
+    room = game.game_name  # Set room name as game name
     if request.method == "POST":
         input_name = request.form.get("name")
-
-        # 检查输入的名字是否与当前登录的用户名一致
+        # Check if the name entered is the same as the currently logged in user name
         if input_name != current_user.username:
             flash('You must enter your own username to join the chat.', 'error')
             return redirect(url_for("community_page", game_id=game_id))
-
-        session['name'] = input_name  # 存储用户名到会话中
-        session['room'] = room  # 存储房间名到会话中
-
-        # 初始化房间如果它不存在
+        session['name'] = input_name  # Store username in the session
+        session['room'] = room  # Store room name in the session
+        # Initialize the room if it does not exist
         if room not in rooms:
             rooms[room] = {"messages": [], "members": 0}
-
         return redirect(url_for("room", game_id=game_id))
-
-    # 对于GET请求，显示社区主页，带有不可编辑的游戏名
+    # For GET requests, displays the community homepage with a non-editable game name
     return render_template("community_home.html", game=game, name=session.get('name', ''))
 
 
 @app.route("/room/<int:game_id>", methods=['GET'])
 @login_required
 def room(game_id):
-
-    game = HoopgameModel.query.get_or_404(game_id)  # 获取游戏详情
+    game = HoopgameModel.query.get_or_404(game_id)  # Get game details
     room_name = game.game_name
     # room = session.get("room")
-
-    # 尝试从会话获取房间名，确保其与游戏名一致
+    # Try getting the room name from the session and make sure it matches the game name
     if 'room' not in session or session['room'] != room_name:
-        session['room'] = room_name  # 更新会话中的房间名
+        session['room'] = room_name  # Update the room name in the session
         if room_name not in rooms:
-            rooms[room_name] = {"messages": [], "members": 0}  # 初始化房间
-
-    # 获取聊天室ID
+            rooms[room_name] = {"messages": [], "members": 0}  # Initialize the room
+    # Get chat room ID
     chat_room = ChatRoomModel.query.filter_by(game_id=game_id).first()
     if not chat_room:
-        # 如果没有找到聊天室，可能需要创建一个
+        # If you can't find a chat room, you may need to create one
         flash('Chat room does not exist. Please create a room first.', 'warning')
         return redirect(url_for("community_page", game_id=game_id))
-
-    # 从数据库加载历史消息
+    # Loading historical messages from the database
     messages = MessageModel.query.filter_by(chat_room_id=chat_room.id).order_by(MessageModel.timestamp.asc()).all()
 
-    # 转换消息格式以便前端显示
+    # Convert message format for front-end display
     history_msgs = [{
-        "username": msg.user.username,  # 确保关联正确的用户信息
+        "username": msg.user.username,  # Ensure the correct user information is associated
         "message": msg.content,
-        "timestamp": msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # 格式化时间戳
+        "timestamp": msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # Formatting timestamps
     } for msg in messages]
 
     if room_name != game.game_name:
-        # 如果房间名不匹配，重定向到 community 页面进行正确的设置
+        # If the room name does not match, redirect to the community page to set it correctly
         flash('Room does not match the selected game.', 'warning')
         return redirect(url_for("community_page", game_id=game_id))
 
-    # 确保房间在字典中存在，否则重定向回 community 页面
+    # Make sure the room exists in the dictionary, otherwise redirect back to the community page
     if room_name not in rooms:
         flash('Room does not exist. Please join again.', 'warning')
         return redirect(url_for("community_page", game_id=game_id))
 
-    # 渲染聊天室页面，传递必要的数据
+    # Render the chat room page and pass necessary data
     return render_template("community.html", room=room, game=game, messages=history_msgs)
 
 
-### SocketIO 事件处理代码
-# 处理接收到的消息
+### SocketIO event handling code
+# Handle received messages
 @socketio.on("message")
 def handle_message(data):
-    print("Received data:", data)  # Debug: 打印接收到的数据
+    print("Received data:", data)  # Debug: print received data
     room_name = data["room"]
     username = data["name"]
     message_content = data["message"]
-
     chat_room = ChatRoomModel.query.filter_by(chat_room_name=room_name).first()
     if not chat_room:
-        print("Chat room does not exist:", room_name)  # Debug: 打印错误信息
-        emit('error', {'message': 'Chat room does not exist.'}, room=request.sid)  # 发送错误到请求的客户端
-        return  # 适当的错误处理
-
+        print("Chat room does not exist:", room_name)  # Debug: Print error information
+        emit('error', {'message': 'Chat room does not exist.'}, room=request.sid)  # Send an error to the requesting client
+        return  # Proper error handling
     if room_name not in rooms:
-        rooms[room_name] = {"messages": [], "members": 0}  # 如果不存在，则初始化房间
-
-    # 创建消息实例并保存到数据库
+        rooms[room_name] = {"messages": [], "members": 0}  # If it does not exist, initialize the room
+    # Create a message instance and save it to the database
     new_message = MessageModel(
-        chat_room_id=chat_room.id,  # 确保你有正确的外键关系或引用方式
-        user_id=current_user.user_id,  # Flask-Login 用户ID
+        chat_room_id=chat_room.id,  # Make sure you have the correct foreign key relationships or references
+        user_id=current_user.user_id,  # Flask-Login UserID
         content=message_content)
     db.session.add(new_message)
 
     try:
         db.session.commit()
-        print("Message saved:", new_message)  # Debug: 打印保存的消息
+        print("Message saved:", new_message)  # Debug: print saved messages
     except Exception as e:
         db.session.rollback()
-        print("Error saving message:", str(e))  # Debug: 打印错误信息
+        print("Error saving message:", str(e))  # Debug: Print wrong msg
         emit('error', {'message': 'Failed to save message.'}, room=request.sid)
         return
 
-    # 构建消息数据
+    # Constructing message data
     msg = {
         "username": username,
         "message": message_content
     }
-    rooms[room_name]["messages"].append(msg)  # 将消息添加到房间的消息列表中
-    send(msg, room=room_name)  # 发送消息到房间中的所有客户端
+    rooms[room_name]["messages"].append(msg)  # Add the message to the room's message list
+    send(msg, room=room_name)  # Send a message to all clients in the room
 
 
-# 当用户加入房间
+# When a user joins a room
 @socketio.on("join")
 def on_join(data):
     user_id = current_user.user_id
     room = data['room']
     name = data.get('name', 'Unknown')
-    # 用户加入指定的房间
+    # The user joins the specified room
     join_room(room)
-
-    # 确保房间在 rooms 字典中存在
+    # Make sure the room exists in the rooms dictionary
     if room not in rooms:
         rooms[room] = {"messages": [], "members": set(), "count": 0}
-
-
     send({"username": name, "message": f"{name} has joined {room}"}, room=room)
 
 
-# 当用户离开房间
+# When a user leaves a room
 @socketio.on("leave")
 def on_leave(data):
     room = data['room']
     name = data['name']
-
-    # 用户离开指定的房间
+    # The user leaves the specified room
     leave_room(room)
-
-    # 广播用户离开消息
+    # Broadcast user leaving message
     send({"name": name, "message": f"{name} has left the room"}, room=room)
 
 
@@ -466,14 +457,11 @@ def save_picture(form_picture):
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
-
     # Increase the dimensions for better clarity
     output_size = (200, 200)  # Larger dimensions for better image quality
-
     i = Image.open(form_picture)
     i.thumbnail(output_size)  # Resize the image
     i.save(picture_path)
-
     return picture_fn
 
 
@@ -487,7 +475,7 @@ def attend_game(game_id):
         flash('You have successfully joined the game!', 'success')
     else:
         flash('You have already joined this game.', 'info')
-    return redirect(url_for('room', game_id=game_id))  # 假设 'room' 是聊天室的路由
+    return redirect(url_for('room', game_id=game_id))  # Assume 'room' is the route for the chat room
 
 
 @app.route('/check-attendance/<int:game_id>', methods=['GET'])

@@ -31,7 +31,7 @@ class SignUpForm(FlaskForm):
     height = DecimalField('Height(cm)', validators=[DataRequired(), NumberRange(min=140,max=211,message='Field must be between 140cm and 211cm')])
     weight = DecimalField('Weight(kg)', validators=[DataRequired(), NumberRange(min=40,max=300,message='Field must be between 3kg and 300kg')])
     submit = SubmitField('Sign Up')
-    # 如果写成validate_加上form名称就会被自动调用执行
+    # If you write validate_ plus the form name, it will be automatically called and executed
     def validate_date_of_birthday(form, field):
         if field.data > date.today():
             raise ValidationError('Date cannot be greater than today')
