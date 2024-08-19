@@ -63,11 +63,13 @@
     }
 </style>
 
+{#    <meta name="csrf-token" content="{{ csrf_token() }}">#}
+{#    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');#}
 
 <div class="chat-container">
 
     <div class="chat-box">
-    <button id="attend-game-btn" class="btn btn-success" onclick="attendGame({{ game.game_id }})">Attend the Game</button>
+    <button id="attend-game-btn" class="btn btn-success">Attend the Game</button>
     <h2 align="center">Game Chatting Room: {{game.game_name}}</h2>
 
         <div class="chat-messages" id="chat-messages">
@@ -89,71 +91,90 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
       integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
       crossorigin="anonymous"></script>
+
+
 <script type="text/javascript">
-    var socket = io();
+document.addEventListener('DOMContentLoaded', function() {
+    var socket = io();  // 初始化 Socket.IO 客户端
     var gameName = "{{ game.game_name }}";
     var userName = "{{ session['name'] }}";
+    var messageInput = document.getElementById("message");
+    var attendBtn = document.getElementById('attend-game-btn');
 
-    socket.on('connect', function() {
+    // 加入房间
+    socket.on('connect', function () {
         console.log('Connected to server.');
         if (gameName && userName) {
-            socket.emit('join', { room: gameName, name: userName });
+            socket.emit('join', {room: gameName, name: userName});
             console.log('Joined room:', gameName);
         } else {
             console.error('Game name or user name is not defined.');
         }
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var messageInput = document.getElementById("message");
-
-        messageInput.addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Prevent default line break
-                sendMessage(); // Call the sendMessage function
-            }
-        });
-    });
-
-    socket.on('message', function(data) {
-        console.log('Received message:', data);
-        var chatMessages = document.getElementById("chat-messages");
-        var msgElement = document.createElement("div");
-        msgElement.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
-        chatMessages.appendChild(msgElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to new message
+    // 发送消息
+    messageInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
+        }
     });
 
     function sendMessage() {
-        var messageInput = document.getElementById("message");
         var message = messageInput.value.trim();
         if (message === "") {
             console.log('Cannot send an empty message.');
             return;
         }
-        socket.emit('message', { name: userName, message: message, room: gameName });
-        messageInput.value = ''; // Clear the input box
+        socket.emit('message', {name: userName, message: message, room: gameName});
+        messageInput.value = '';
         console.log('Sent message:', message);
     }
 
+    // 接收消息
+    socket.on('message', function (data) {
+        console.log('Received message:', data);
+        var chatMessages = document.getElementById("chat-messages");
+        var msgElement = document.createElement("div");
+        msgElement.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
+        chatMessages.appendChild(msgElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // 自动滚动到最新消息
+    });
+
+    // 参加游戏
+    if (attendBtn) {
+        attendBtn.addEventListener('click', function() {
+            var gameId = "{{ game.game_id }}";
+            attendGame(gameId);
+        });
+    }
+
     function attendGame(gameId) {
-        fetch(`/attend-game/${gameId}`, { method: 'POST' })
+        console.log("Trying to attend game with ID:", gameId);
+        fetch(`/attend-game/${gameId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({})  // 确保发送至少是空的 JSON 对象
+        })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error, status = ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            if (data.status === 'success') {
-                document.getElementById('attend-game-btn').innerText = 'Game Attended';
-            }
             alert(data.message);
+            if (data.status === 'success') {
+                attendBtn.innerText = 'Game Attended';
+                attendBtn.disabled = true;
+            }
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('An error occurred. Please try again later.');
         });
     }
+});
 </script>
 
 {% endblock %}

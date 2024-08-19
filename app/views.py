@@ -146,11 +146,11 @@ def forget_password():
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     user = User.verify_reset_token(token)
-    if 'reset_successful' in session:
-        flash('Your password has been updated successfully.', 'success')
-        return redirect(url_for('login_page'))
+    # if 'reset_successful' in session:
+    #     flash('Your password has been updated successfully.', 'success')
+    #     return redirect(url_for('login_page'))
 
-    if user is None and request.method == 'GET':
+    if user is None:
         flash('Invalid or expired token, please try again.','warning')
         return redirect(url_for('forget_password'))
 
@@ -159,8 +159,9 @@ def reset_password(token):
         hashed_password = bcrypt.generate_password_hash(form.current_password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        session['reset_successful'] = True
-        return redirect(url_for('reset_password', token=token))
+        # session['reset_successful'] = True
+        flash('Your password has been updated successfully.', 'success')
+        return redirect(url_for('login_page'))
 
     return render_template('reset_password.html',form=form, token=token)
 
@@ -472,18 +473,21 @@ def attend_game(game_id):
     if game not in current_user.games:
         current_user.games.append(game)
         db.session.commit()
-        flash('You have successfully joined the game!', 'success')
+        return jsonify({'status': 'success', 'message': 'You have successfully joined the game!'}), 200
     else:
-        flash('You have already joined this game.', 'info')
-    return redirect(url_for('room', game_id=game_id))  # Assume 'room' is the route for the chat room
+        return jsonify({'status': 'info', 'message': 'You have already joined this game.'}), 200
 
 
 @app.route('/check-attendance/<int:game_id>', methods=['GET'])
 @login_required
 def check_attendance(game_id):
     game = HoopgameModel.query.get(game_id)
-    attended = game in current_user.games
-    return jsonify({'attended': attended})
+    if game:
+        attended = game in current_user.games
+        return jsonify({'attended': attended}), 200
+    else:
+        return jsonify({'error': 'Game not found'}), 404
+
 
 
 
