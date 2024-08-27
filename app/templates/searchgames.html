@@ -32,6 +32,7 @@
             background-color: #0056b3; /* Darker blue */
         }
     </style>
+
     <div id="mapContainer">
         <div id="map"></div>
         <button id="findLocationBtn" onclick="locateUser()">Find My Location</button>
@@ -67,7 +68,7 @@
     searchControl.on('results', function(data) {
         var firstResult = data.results[0];
         if (firstResult) {
-            map.setView(firstResult.center, 18); // 根据搜索结果缩放和定位地图
+            map.setView(firstResult.center, 18); // Zoom and position the map based on search results
             L.marker(firstResult.center).addTo(map)
                 .bindPopup("You selected: " + firstResult.label).openPopup();
         }

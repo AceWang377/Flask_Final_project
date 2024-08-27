@@ -171,7 +171,7 @@ def reset_password(token):
 # logout
 @app.route('/logout')
 def logout_page():
-    logout_user() # 替换session[].pop()
+    logout_user() # Replace session[].pop()
     flash(f'You have been logged out successful!','success')
     return redirect(url_for('home'))
 

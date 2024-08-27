@@ -69,7 +69,7 @@
             </div>
             {{ form.submit(class="btn btn-primary") }}
         </form>
-        <!-- 其他个人信息 -->
+        <!-- Other user profile -->
         <p>Email: {{ user.email }}</p>
         <p>Date of Birth: {{ user.date_of_birth.strftime('%Y-%m-%d') }}</p>
         <p>Telephone: {{ user.telephone }}</p>
@@ -95,7 +95,7 @@
         <h2>Your Messages in Chatrooms</h2>
         <ul>
             {% for chatroom in chat_rooms %}
-                <!-- 使用 Flask url_for 构建动态链接到聊天室 -->
+                <!-- Use Flask url_for to build dynamic links to chat rooms -->
                 <li>
                     <a href="{{ url_for('room', game_id=chatroom.game_id) }}" class="chatroom-link">
                         Join {{ chatroom.chat_room_name }}

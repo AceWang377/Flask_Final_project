@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var messageInput = document.getElementById("message");
     var attendBtn = document.getElementById('attend-game-btn');
 
-    // 加入房间
+    // Join room
     socket.on('connect', function () {
         console.log('Connected to server.');
         if (gameName && userName) {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 发送消息
+    // Send msg
     messageInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Sent message:', message);
     }
 
-    // 接收消息
+    // receive msg
     socket.on('message', function (data) {
         console.log('Received message:', data);
         var chatMessages = document.getElementById("chat-messages");
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMessages.scrollTop = chatMessages.scrollHeight; // 自动滚动到最新消息
     });
 
-    // 参加游戏
+    // Join game
     if (attendBtn) {
         attendBtn.addEventListener('click', function() {
             var gameId = "{{ game.game_id }}";
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/attend-game/${gameId}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({})  // 确保发送至少是空的 JSON 对象
+            body: JSON.stringify({})  // Make sure to send at least an empty JSON object
         })
         .then(response => {
             if (!response.ok) {

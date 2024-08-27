@@ -86,11 +86,11 @@
 {#                                                <li class="{{ active if request.path == url_for('contact') else '' }}"><a href="{{ url_for('contact') }}">Contact</a></li>#}
 
                                                 {% if current_user.is_authenticated %}
-                                                <!-- 显示用户名和注销按钮 -->
+
                                                 <li><a href="{{ url_for('profile') }}">{{ current_user.username }}</a></li>
                                                 <li><a href="{{ url_for('logout_page') }}" role="button">Logout</a></li>
                                                 {% else %}
-                                                <!-- 显示登录和注册按钮 -->
+
                                                 <li><a href="{{ url_for('login_page') }}" role="button">Account</a></li>
                                                 {% endif %}
                                             </ul>
@@ -141,10 +141,10 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
     $(document).ready(function(){
-        // 当点击导航链接时执行此函数
+        //
         $(".navbar-right a").on("click", function(){
-            $(".navbar-right").find(".active").removeClass("active"); // 先移除其它链接的 'active' 类
-            $(this).parent().addClass("active"); // 然后为当前点击的链接的父元素添加 'active' 类
+            $(".navbar-right").find(".active").removeClass("active"); //
+            $(this).parent().addClass("active"); //
         });
     });
     </script>
