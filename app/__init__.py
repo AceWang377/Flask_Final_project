@@ -61,7 +61,7 @@ login_manager.login_view = 'login_page'
 
 basedir = os.path.abspath(os.path.dirname(__file__)) # get the path of current file
 # Set the URI of the SQL database. The database file is located in the data folder under the project directory and the file name is hooplife
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:aqj710310@localhost/hooplife'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:******@localhost/hooplife'
 
 from sqlalchemy.dialects.postgresql.base import PGDialect
 PGDialect._get_server_version_info = lambda *args: (9, 2)
