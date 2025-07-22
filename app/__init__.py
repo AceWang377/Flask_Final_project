@@ -11,7 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 # from flask_wtf.csrf import generate_csrf
 
 app = Flask(__name__) # create flask app
-app.config['SECRET_KEY'] = b'WR#&f&+%78er0we=%799eww+#7^90-;s' # keep secret with flask sessions
+app.config['SECRET_KEY'] = b'****' # keep secret with flask sessions
 # Configure CSRF Protectio
 # csrf = CSRFProtect(app)
 
@@ -48,7 +48,7 @@ app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'hooplife377@fastmail.com'
-app.config['MAIL_PASSWORD'] = '2h3a3b2x944j3u8j'
+app.config['MAIL_PASSWORD'] = '****'
 #
 # # initialize mail
 mail = Mail(app)
