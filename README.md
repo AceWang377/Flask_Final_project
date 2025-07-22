@@ -34,12 +34,16 @@
    ```bash
    git clone https://github.com/AceWang377/HoopLife.git
    cd HoopLife
-2. Create and Activate Virtual Environment
-   python -m venv venv
-   source venv/bin/activate        # On Windows: venv\Scripts\activate
+   ```
+2. **Create and Activate Virtual Environment**
+   ```bash python -m venv venv source venv/bin/activate # On Windows: venv\Scripts\activate ```
    
 3. Install Dependencies
+   ```bash
    pip install -r requirements.txt
+   ```
 
 4. Run the Application
-   flask run (type this line code in terminal)
+   ```bash
+   flask run #type this line code in terminal
+   ```
